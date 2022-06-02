@@ -12,6 +12,9 @@ If you have any problems, please contact me on discord - johngetman#5518
 ## How install gMenu alpha?
 [Youtube guide](https://youtu.be/2KcPMqkw3nI)
 
+## How configure gMenu
+Open lua/menu/gmenu/gmenu.lua, then edit any values you need.
+
 ## Screenshots
 ![First](https://github.com/johngetman/gmenu/blob/main/pictures/01.png?raw=true)
 ![Second](https://github.com/johngetman/gmenu/blob/main/pictures/02.png?raw=true)
