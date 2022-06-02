@@ -2,6 +2,8 @@
 gMenu is lua-powered menu for Garry's Mod.
 It's many times faster than the regular Garry's Mod menu because it's written in pure gLua.
 
+If you have any problems, please contact me on discord - johngetman#5518
+
 ## Why gMenu?
 1. Faster than default Garry's Mod menu.
 2. Customizable (you can edit fonts, colors, offsets)
