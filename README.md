@@ -10,7 +10,7 @@ If you have any problems, please contact me on discord - johngetman#5518
 3. Looks beautiful
 
 ## How install gMenu alpha?
-Coming soon
+[Youtube guide](https://youtu.be/2KcPMqkw3nI)
 
 ## Screenshots
 ![First](https://github.com/johngetman/gmenu/blob/main/pictures/01.png?raw=true)
