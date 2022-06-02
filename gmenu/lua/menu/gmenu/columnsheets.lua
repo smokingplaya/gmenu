@@ -139,7 +139,7 @@ function panel:Init()
     self.Menu.Search:SetTextColor(gmenu_text)
     self.Menu.Search:SetTall(30)
     self.Menu.Search:SetDrawLanguageID(false)
-    self.Menu.Search:SetText(language.GetPhrase("searchbar_placeholer"))
+    self.Menu.Search:SetPlaceholderText(language.GetPhrase("searchbar_placeholer"))
     self.Menu.Search.Paint = function(panel, w, h)
         if ( panel.m_bBackground ) then
             draw.RoundedBox(gmenu.Config.HasOffset and gmenu_round or 0, 0, 0, w, h, gmenu_sec)
