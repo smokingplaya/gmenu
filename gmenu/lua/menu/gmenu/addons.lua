@@ -48,7 +48,7 @@ function gmenu:GetAddons()
             end)
         end
 
-        columnsheet:AddTab("Установленные", panelws)
+        columnsheet:AddTab("Installed", panelws)
     end
 
     columnsheet:AddTab(language.GetPhrase("addons.openworkshop"), function()
