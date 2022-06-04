@@ -3,6 +3,8 @@
     https://github.com/Facepunch/garrysmod/blob/master/garrysmod/lua/vgui/dcolumnsheet.lua
 ]]--
 
+-- Да, я знаю что это очень странный метод для создания такой менюшки...
+
 local panel = {}
 
 AccessorFunc( panel, "ActiveButton", "ActiveButton" )
@@ -29,7 +31,7 @@ function panel:Init()
 		self.Menu.Clock:SetWide(100)
 		
 		if self.HasOffset then
-			self.Menu.Clock:DockMargin(5, 5, 5, 5)
+			self.Menu.Clock:DockMargin(0, 5, 5, 5)
 		end
 
 		self.Menu.Clock.Paint = function(panel, w, h)
@@ -43,11 +45,80 @@ function panel:Init()
 		end
 	end
 
+	self.Menu.Gamemode = self.Menu:Add("DButton")
+	self.Menu.Gamemode:Dock(RIGHT)
+	self.Menu.Gamemode:SetWide(40)
+	self.Menu.Gamemode:SetText("")
+	--self.Menu.Gamemode:SetTooltip(engine.GetNiceGamemode(engine.ActiveGamemode())) -- TODO: Fix it
+	self.Menu.Gamemode.DoClick = function(self)
+		local dmenu = gmenu.gui:DMenu()
+		dmenu:SetMaxHeight(ScrW()*0.8)
+		
+		for k, v in ipairs(engine.GetGamemodes()) do
+			if v.name == "base" then continue end
+
+			dmenu:AddOption(v.title, function()
+				self:SetTooltip(v.title)
+				RunConsoleCommand("gamemode", v.name)
+			end)
+		end
+
+		dmenu:Open()
+	end
+	
+	local mat = Material("gmenu/gamemodes.png")
+	
+	self.Menu.Gamemode.Paint = function(panel, w, h)
+		draw.RoundedBox(self.HasOffset and gmenu_round or 0, 0, 0, w, h, panel:IsHovered() and gmenu_trit or gmenu_sec)
+
+		surface.SetDrawColor(gmenu_text)
+		surface.SetMaterial(mat)
+		surface.DrawTexturedRect(w/2-8, h/2-8, 16, 16)
+	end
+
+	--
+	
+	self.Menu.Language = self.Menu:Add("DButton")
+	self.Menu.Language:Dock(RIGHT)
+	self.Menu.Language:SetWide(40)
+	self.Menu.Language:SetText("")
+	self.Menu.Language.DoClick = function(self)
+		local dmenu = gmenu.gui:DMenu() --DermaMenu()
+		dmenu:SetMaxHeight(ScrW()*0.8)
+		
+		for k, v in pairs(engine.GetLanguages()) do
+			dmenu:AddOption(k, function()
+				RunConsoleCommand("gmod_language", k)
+				self.Icon = Material(GetLanguageIcon(v))
+			end):SetIcon(GetLanguageIcon(v))
+		end
+
+		dmenu:Open()
+	end
+	
+	self.Menu.Language.Icon = Material(GetLanguageIcon(engine.GetLanguages()[GetConVarString( "gmod_language" )])) or Material("gmenu/language.png")
+	
+	self.Menu.Language.Paint = function(panel, w, h)
+		draw.RoundedBox(self.HasOffset and gmenu_round or 0, 0, 0, w, h, panel:IsHovered() and gmenu_trit or gmenu_sec)
+
+		surface.SetDrawColor(gmenu_text)
+		surface.SetMaterial(panel.Icon)
+		surface.DrawTexturedRect(w/2-8, h/2-8, 16, 16)
+	end
+
+	--
+
 	self.Content = self:Add("Panel")
 	self.Content:Dock( FILL )
 
 	if self.HasOffset then
 		self.Content:DockMargin(10, 10, 10, 0)
+
+		self.Menu.Gamemode:SetWide(30)
+		self.Menu.Gamemode:DockMargin(0, 5, 5, 5)
+
+		self.Menu.Language:SetWide(30)
+		self.Menu.Language:DockMargin(0, 5, 5, 5)
 	end
 
 	self.Items = {}
@@ -132,33 +203,9 @@ function panel:Init()
 	self.Menu:Dock(LEFT)
 	self.Menu:SetWide(200)
 
-	self.Menu.Search = self.Menu:Add("DTextEntry")
+	self.Menu.Search = gmenu.gui:TextEntry(self.Menu, language.GetPhrase("searchbar_placeholer"))
     self.Menu.Search:Dock(TOP)
 	self.Menu.Search:DockMargin(0, 0, 0, 10)
-    self.Menu.Search:SetFont("gmenu.16")
-    self.Menu.Search:SetTextColor(gmenu_text)
-    self.Menu.Search:SetTall(30)
-    self.Menu.Search:SetDrawLanguageID(false)
-    self.Menu.Search:SetPlaceholderText(language.GetPhrase("searchbar_placeholer"))
-    self.Menu.Search.Paint = function(panel, w, h)
-        if ( panel.m_bBackground ) then
-            draw.RoundedBox(gmenu.Config.HasOffset and gmenu_round or 0, 0, 0, w, h, gmenu_sec)
-        end
-
-        if ( panel.GetPlaceholderText && panel.GetPlaceholderColor && panel:GetPlaceholderText() && panel:GetPlaceholderText():Trim() != "" && panel:GetPlaceholderColor() && ( !panel:GetText() || panel:GetText() == "" ) ) then
-            local oldText = panel:GetText()
-
-            local str = panel:GetPlaceholderText()
-            if ( str:StartWith( "#" ) ) then str = str:sub( 2 ) end
-            str = language.GetPhrase( str )
-
-            panel:SetText( str )
-            panel:DrawTextEntryText( panel:GetPlaceholderColor(), panel:GetHighlightColor(), panel:GetCursorColor() )
-            panel:SetText( oldText )
-            return
-        end
-        panel:DrawTextEntryText( panel:GetTextColor(), panel:GetHighlightColor(), panel:GetCursorColor() )
-    end
 
 	self.Menu.Search.OnEnter = function(panel, value)
 		for k, v in ipairs(self.Items) do
