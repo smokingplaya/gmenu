@@ -62,6 +62,7 @@ end
 
 --[[ Including other files ]]--
 
+include "gui.lua"
 include "columnsheets.lua"
 include "singleplayer.lua"
 include "multiplayer.lua"
