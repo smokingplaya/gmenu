@@ -6,7 +6,6 @@ function gmenu:GetMultiplayer()
 
     local registerGamemode = function(gm)
         local panel = vgui.Create("DListView")
-        --panel.VBar:SetWide(0)
         panel.DoDoubleClick = function(self, _, panel)
             JoinServer(panel.ip) -- Connect to the server
         end
