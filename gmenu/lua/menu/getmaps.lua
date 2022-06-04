@@ -214,19 +214,6 @@ local function LoadFavourites()
 
 end
 
--- Called from JS when starting a new game
-function UpdateMapList()
-
-	local MapList = GetMapList()
-	if ( !MapList ) then return end
-
-	local json = util.TableToJSON( MapList )
-	if ( !json ) then return end
-
-	pnlMainMenu:Call( "UpdateMaps(" .. json .. ")" )
-
-end
-
 local IgnorePatterns = {
 	"^background",
 	"^devtest",
@@ -338,10 +325,6 @@ local function RefreshMaps( skip )
 		end
 
 	end
-
-	-- Send the new list to the HTML menu
-	UpdateMapList()
-
 end
 
 -- Update only after a short while for when these hooks are called very rapidly back to back
@@ -358,7 +341,6 @@ function GetMapList()
 end
 
 function ToggleFavourite( map )
-
 	LoadFavourites()
 
 	if ( table.HasValue( favmaps, map ) ) then -- is favourite, remove it
@@ -370,8 +352,6 @@ function ToggleFavourite( map )
 	cookie.Set( "favmaps", table.concat( favmaps, ";" ) )
 
 	RefreshMaps( true )
-
-	UpdateMapList()
 
 end
 
@@ -386,7 +366,6 @@ function SaveLastMap( map, cat )
 end
 
 function LoadLastMap()
-
 	local t = string.Explode( ";", cookie.GetString( "lastmap", "" ) )
 
 	local map = t[ 1 ] or "gm_flatgrass"
@@ -395,7 +374,4 @@ function LoadLastMap()
 	cat = string.gsub( cat, "'", "\\'" )
 
 	if ( !file.Exists( "maps/" .. map .. ".bsp", "GAME" ) ) then return end
-
-	pnlMainMenu:Call( "SetLastMap('" .. map:JavascriptSafe() .. "','" .. cat:JavascriptSafe() .. "')" )
-
 end
