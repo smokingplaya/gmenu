@@ -5,7 +5,7 @@ function gmenu:GetSingleplayer()
 
     local loadmain = function()
         local maps = GetMapList()
-        local hostname, p2pEN, p2pFO, lan, maxplayers, mapname = "Garry's Mod", true, false, false, 0, nil
+        local hostname, p2pEN, p2pFO, lan, maxplayers, mapname = "Garry's Mod", true, false, false, 1, nil
         for k, v in pairs(maps) do
             local pan = vgui.Create("Panel")
             pan:Dock(FILL)
@@ -16,7 +16,6 @@ function gmenu:GetSingleplayer()
             -- maps list
             local mapList = pan:Add("DIconLayout") -- TODO: MAKE SCROLL
             mapList:Dock(FILL)
-            mapList.Summ = 240+200
 
             if self.Config.HasOffset then
                 mapList:SetSpaceX(10)
@@ -47,7 +46,7 @@ function gmenu:GetSingleplayer()
             for _, map in ipairs(v) do
                 local mapPanel = mapList:Add("DButton")
                 mapPanel:SetText("")
-                mapPanel.Size = 128 --(ScrW()-mapList.Summ)/6 
+                mapPanel.Size = 128
                 mapPanel:SetSize(mapPanel.Size, mapPanel.Size+24)
                 local m = Material("maps/thumb/".. map ..".png")
                 mapPanel.mat, mapPanel.matgrad = m:IsError() and Material("gmenu/mapnothumb.png") or m, Material("vgui/gradient_up")
@@ -80,54 +79,22 @@ function gmenu:GetSingleplayer()
             controls:Dock(RIGHT)
             controls:SetWide((ScrW() <= 800 and 200 or 300))
 
-            controls.hostname = controls:Add("DTextEntry")
+            controls.hostname = gmenu.gui:TextEntry(controls, hostname)
             controls.hostname:Dock(TOP)
-            controls.hostname:SetFont("gmenu.16")
-            controls.hostname:SetTextColor(gmenu_text)
-            controls.hostname:SetTall(30)
-            controls.hostname:SetDrawLanguageID(false)
-            controls.hostname:SetText(hostname)
-            controls.hostname.Paint = function(panel, w, h)
-                if ( panel.m_bBackground ) then
-                    draw.RoundedBox(self.Config.HasOffset and gmenu_round or 0, 0, 0, w, h, gmenu_sec)
-                end
-
-                if ( panel.GetPlaceholderText && panel.GetPlaceholderColor && panel:GetPlaceholderText() && panel:GetPlaceholderText():Trim() != "" && panel:GetPlaceholderColor() && ( !panel:GetText() || panel:GetText() == "" ) ) then
-                    local oldText = panel:GetText()
-
-                    local str = panel:GetPlaceholderText()
-                    if ( str:StartWith( "#" ) ) then str = str:sub( 2 ) end
-                    str = language.GetPhrase( str )
-
-                    panel:SetText( str )
-                    panel:DrawTextEntryText( panel:GetPlaceholderColor(), panel:GetHighlightColor(), panel:GetCursorColor() )
-                    panel:SetText( oldText )
-                    return
-                end
-                panel:DrawTextEntryText( panel:GetTextColor(), panel:GetHighlightColor(), panel:GetCursorColor() )
-            end
 
             controls.hostname.OnTextChanged = function(self)
                 hostname = self:GetValue()
             end
 
-            controls.maxplayers = controls:Add("DComboBox")
+            --
+
+            controls.maxplayers = gmenu.gui:ComboBox(controls, {1, 2, 4, 8, 16, 32, 64, 128}, maxplayers)
             controls.maxplayers:Dock(TOP)
-            controls.maxplayers:SetFont("gmenu.16")
-            controls.maxplayers:SetTextColor(gmenu_text)
-            controls.maxplayers:SetTall(30)
-            controls.maxplayers:SetSortItems(false)
-            controls.maxplayers.Paint = function(panel, w, h)
-                return draw.RoundedBox(self.Config.HasOffset and gmenu_round or 0, 0, 0, w, h, gmenu_sec)
-            end
-
-            for k, v in ipairs({1, 2, 4, 8, 16, 32, 64, 128}) do
-                controls.maxplayers:AddChoice(v)
-            end
-
             controls.maxplayers.OnSelect = function(_, _, val)
                 maxplayers = tonumber(val)
             end
+
+            --
 
             controls.play = controls:Add("DButton")
             controls.play:Dock(BOTTOM)
