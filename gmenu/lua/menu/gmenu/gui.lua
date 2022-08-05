@@ -1,5 +1,7 @@
 gmenu.gui = {}
 
+local ho = gmenu.Config.HasOffset
+
 oldDermaMenu = DermaMenu
 function gmenu.gui.DMenu()
     local dmenu = oldDermaMenu()
@@ -21,11 +23,11 @@ function gmenu.gui.DMenu()
 
     dmenu.OldOpen = dmenu.Open
     dmenu.Open = function(self, x, y, s, o)
-        if not gmenu.Config.HasOffset then
+        if not ho then
             for k, v in ipairs(self.Options) do
                 v.lt, v.rt, v.lb, v.rb = false, false, false, false
             end
-        else
+        else -- передаю челендж по фиксу этого Jaff'у
             local count = table.Count(self.Options)
             local i = 0
             for k, v in ipairs(self.Options) do
@@ -51,19 +53,115 @@ end
 
 DermaMenu = gmenu.gui.DMenu
 
-function gmenu.gui:TextEntry(parent, placeholderText, font)
-    local panel = vgui.Create("DTextEntry", parent)
-    panel:SetPlaceholderColor(gmenu_stext)
-    panel:SetPlaceholderText(placeholderText)
-    panel:SetFont("gmenu." .. (font or "16"))
-    panel:SetTextColor(gmenu_text)
-    panel:SetTall(30)
-    panel:SetDrawLanguageID(false)
-    panel.Paint = function(panel, w, h)
-        if ( panel.m_bBackground ) then
-            draw.RoundedBox(gmenu.Config.HasOffset and gmenu_round or 0, 0, 0, w, h, gmenu_sec)
-        end
+function gmenu.gui:Button(parent, text, font)
+    local button = vgui.Create("DButton", parent)
+    button:SetText(text or "gMenu")
+    button:SetTextColor(gmenu_text)
+    button:SetFont("gmenu." .. (font or "16"))
+    
+    button.Col1 = gmenu_prim
+    button.Col2 = gmenu_sec
+    button.ColDraw = button.Col1
 
+    button.SetColor = function(self, col)
+        self.ColDraw = col
+    end
+
+    button.SetColorStyle = function(self, col1, col2)
+        self:SetColor(col2)
+        self.Col1 = col1
+        self.Col1 = col2
+    end
+
+    button.GetColor = function(self)
+        return self.ColDraw
+    end
+
+    button.OnCursorEntered = function(self)
+        self:ColorTo(self.Col2, 0.1, 0)
+    end
+
+    button.OnCursorExited = function(self)
+        self:ColorTo(self.Col1, 0.1, 0)
+    end
+
+    button.SetIcon = function(self, icon, w, h)
+        self.Icon = icon or Material(icon)
+        self.IconW = w
+        self.IconH = h
+        
+        self:SetText("")
+    end
+
+    button.Paint = function(self, w, h)
+        draw.RoundedBox(ho and gmenu_round or 0, 0, 0, w, h, self.ColDraw)
+
+        if self.Icon then
+            surface.SetDrawColor(gmenu_text)
+            surface.SetMaterial(self.Icon)
+            surface.DrawTexturedRect((w/2-self.IconW/2), (h/2-self.IconH/2), self.IconW, self.IconH)
+        end
+    end
+
+    return button
+end
+
+function gmenu.gui:SetVBar(vbar)
+    if not ispanel(vbar) then return end
+
+    vbar:SetWide(ho and (gmenu_round*2)+2 or 4+2)
+    vbar:SetHideButtons(true)
+    vbar.Paint = nil
+    
+    vbar.btnGrip.SetColor = function(self, col)
+        self.ColDraw = col
+    end
+
+    vbar.btnGrip:SetColor(gmenu_sec)
+
+    vbar.btnGrip.Paint = function(self, w, h)
+        draw.RoundedBox(ho and gmenu_round or 0, 2, 0, w-2, h, self.ColDraw)
+    end
+
+    return vbar
+end
+
+function gmenu.gui:ScrollPanel(parent)
+    local panel = vgui.Create("DScrollPanel", parent)
+    self:SetVBar(panel:GetVBar())
+
+    return panel
+end
+
+function gmenu.gui:DListView(parent)
+    local panel = vgui.Create("DListView", parent)
+    self:SetVBar(panel.VBar)
+
+    return panel
+end
+
+function gmenu.gui:TextEntry(parent, placeholderText, font)
+    local panel = vgui.Create("Panel", parent)
+    
+    panel.SetColor = function(self, col)
+        self.ColDraw = col
+    end
+
+    panel:SetColor(gmenu_prim)
+
+    panel.Paint = function(panel, w, h)
+        draw.RoundedBox(ho and gmenu_round or 0, 0, 0, w, h, panel.ColDraw)
+    end
+
+    local entry = vgui.Create("DTextEntry", panel)
+    entry:SetPlaceholderColor(gmenu_stext)
+    entry:SetPlaceholderText(placeholderText)
+    entry:SetFont("gmenu." .. (font or "16"))
+    entry:SetTextColor(gmenu_text)
+    entry:Dock(FILL)
+    entry:DockMargin(4, 0, 0, 0)
+    entry:SetDrawLanguageID(false)
+    entry.Paint = function(panel, w, h)
         if ( panel.GetPlaceholderText && panel.GetPlaceholderColor && panel:GetPlaceholderText() && panel:GetPlaceholderText():Trim() != "" && panel:GetPlaceholderColor() && ( !panel:GetText() || panel:GetText() == "" ) ) then
             local oldText = panel:GetText()
 
@@ -79,7 +177,7 @@ function gmenu.gui:TextEntry(parent, placeholderText, font)
         panel:DrawTextEntryText( panel:GetTextColor(), panel:GetHighlightColor(), panel:GetCursorColor() )
     end
 
-    return panel
+    return panel, entry
 end
 
 function gmenu.gui:ComboBox(parent, tab, defaultValue, font)
@@ -97,7 +195,7 @@ function gmenu.gui:ComboBox(parent, tab, defaultValue, font)
 
     panel:SetValue(defaultValue)
     panel.Paint = function(panel, w, h)
-        return draw.RoundedBox(gmenu.Config.HasOffset and gmenu_round or 0, 0, 0, w, h, gmenu_sec)
+        return draw.RoundedBox(ho and gmenu_round or 0, 0, 0, w, h, gmenu_sec)
     end
 
     return panel
