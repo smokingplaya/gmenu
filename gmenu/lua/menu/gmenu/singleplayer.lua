@@ -79,8 +79,10 @@ function gmenu:GetSingleplayer()
             controls:Dock(RIGHT)
             controls:SetWide((ScrW() <= 800 and 200 or 300))
 
-            controls.hostname = gmenu.gui:TextEntry(controls, hostname)
-            controls.hostname:Dock(TOP)
+            controls.hostnamePan, controls.hostname = gmenu.gui:TextEntry(controls, hostname)
+            controls.hostnamePan:Dock(TOP)
+            controls.hostnamePan:SetColor(gmenu_sec)
+            controls.hostnamePan:SetTall(30)
 
             controls.hostname.OnTextChanged = function(self)
                 hostname = self:GetValue()
@@ -112,7 +114,7 @@ function gmenu:GetSingleplayer()
 
             if self.Config.HasOffset then
                 controls:DockMargin(0, 5, 5, 5)
-                controls.hostname:DockMargin(5, 5, 5, 0)
+                controls.hostnamePan:DockMargin(5, 5, 5, 0)
                 controls.maxplayers:DockMargin(5, 5, 5, 0)
 
                 controls.play:DockMargin(5, 0, 5, 5)
