@@ -1,4 +1,4 @@
-# gMenu alpha
+# gMenu alpha 1.2
 gMenu is lua-powered menu for Garry's Mod.
 It's many times faster than the regular Garry's Mod menu because it's written in pure gLua.
 
