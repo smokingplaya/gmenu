@@ -1,4 +1,3 @@
-
 include( "background.lua" )
 include( "cef_credits.lua" )
 include( "openurl.lua" )
@@ -40,12 +39,20 @@ function PANEL:Init()
 	end
 end
 
+function PANEL:Call()
+end
+
 function PANEL:Notification(text, time)
+	if self.NotifyPan then
+		self.NotifyPan:Remove()
+	end
+
 	surface.SetFont("gmenu.18")
 	local w = surface.GetTextSize(text)
 	local width = w+20
 
 	local panel = self:Add("DPanel")
+	self.NotifyPan = panel
 	panel:SetSize(width, 28)
 	panel:SetPos(-width-10, 10)
 	panel:MoveTo(10, 10, 0.3, 0, -1)
@@ -56,13 +63,15 @@ function PANEL:Notification(text, time)
 	
 	timer.Simple(time or 2, function()
 		if IsValid(panel) then
-			panel:AlphaTo(0, 0.3, 0)
+			panel:AlphaTo(0, 0.3, 0, function()
+				panel:Remove()
+				self.NotifyPan = nil
+			end)
 		end
 	end)
 end
 
 function PANEL:ScreenshotScan( folder )
-
 	local bReturn = false
 
 	local Screenshots = file.Find( folder .. "*.*", "GAME" )
@@ -74,7 +83,6 @@ function PANEL:ScreenshotScan( folder )
 	end
 
 	return bReturn
-
 end
 
 function PANEL:Paint()
@@ -138,16 +146,6 @@ function GetLanguageIcon(str, material)
 	return material and Material(str) or str
 end
 
-function engine.GetNiceGamemode(str)
-	local gm = "N/A"
-	for k, v in ipairs(engine.GetGamemodes()) do -- TODO: make it table
-		if v.name ~= str then return end
-		gm = v.title
-	end
-
-	return gm
-end
-
 function engine.GetLanguages()
 	return iconLanguageTable
 end
@@ -176,8 +174,9 @@ timer.Simple(0, function()
 
 	hook.Run( "GameContentChanged" )
 
-	timer.Simple(1, function()
+	timer.Simple(0, function()
 		if file.Exists("gmenu/gmenu.txt", "DATA") then return end
+		
 		local welcomeFrame = vgui.Create("DFrame")
 		welcomeFrame.SysTime = SysTime()
 		welcomeFrame:SetAlpha(0)
@@ -192,17 +191,14 @@ timer.Simple(0, function()
 			draw.RoundedBox(gmenu.Config.HasOffset and gmenu.Config.Rounding or 0, 0, 0, w, h, gmenu_prim)
 		end
 
-		welcomeFrame.closeBtn = welcomeFrame:Add("DButton")
-		welcomeFrame.closeBtn:SetSize(24, 24)
 		local ho = gmenu.Config.HasOffset
-		local x, y = ho and welcomeFrame:GetWide()-24-12 or welcomeFrame:GetWide()-24, ho and 12 or 0
+
+		welcomeFrame.closeBtn = gmenu.gui:Button(welcomeFrame)
+		welcomeFrame.closeBtn:SetSize(32, 32)
+		local x, y = ho and welcomeFrame:GetWide()-32-12 or welcomeFrame:GetWide()-32, ho and 12 or 0
 		welcomeFrame.closeBtn:SetPos(x, y)
-		welcomeFrame.closeBtn:SetText("r")
-		welcomeFrame.closeBtn:SetTextColor(color_white)
-		welcomeFrame.closeBtn:SetFont("marlett")
-		welcomeFrame.closeBtn.Paint = function(self, w, h)
-			draw.RoundedBox(gmenu.Config.HasOffset and gmenu.Config.Rounding or 0, 0, 0, w, h, self:IsHovered() and gmenu_trit or gmenu_sec)
-		end
+		welcomeFrame.closeBtn:SetIcon(Material("gmenu/close.png"), 16, 16)
+		welcomeFrame.closeBtn:SetColorStyle(gmenu_sec, gmenu_trit)
 
 		welcomeFrame.closeBtn.DoClick = function()
 			welcomeFrame:AlphaTo(0, 0.3, 0, function()
@@ -212,7 +208,7 @@ timer.Simple(0, function()
 			file.CreateDir("gmenu")
 			file.Append("gmenu/gmenu.txt", "by johngetman<3")
 
-			pnlMainMenu:Notification("gMenu alpha", 3)
+			pnlMainMenu:Notification("Thanks for installing gMenu, enjoy your use!", 3)
 		end
 
 		welcomeFrame.Content = welcomeFrame:Add("Panel")
@@ -227,23 +223,17 @@ timer.Simple(0, function()
 		welcomeFrame.Content.Bottom:SetTall(35)
 
 		local buttons = {
-			["Our Github"] = "https://github.com/johngetman/gmenu",
+			["gMenu Github Repo"] = "https://github.com/johngetman/gmenu"
 		}
 
 		local createdButtons = {}
 		for k, v in pairs(buttons) do
-			local button = vgui.Create("DButton", welcomeFrame.Content.Bottom)
+			local button = gmenu.gui:Button(welcomeFrame.Content.Bottom, k, "18B")
 			button:Dock(LEFT)
-			button:SetText(k)
-			button:SetFont("gmenu.18B")
-			button:SetTextColor(color_white)
+			button:SetColorStyle(gmenu_sec, gmenu_trit)
 
 			button.DoClick = function()
 				gui.OpenURL(v)	
-			end
-
-			button.Paint = function(self, w, h)
-				draw.RoundedBox(0, 0, 0, w, h, self:IsHovered() and gmenu_trit or gmenu_sec)
 			end
 
 			table.insert(createdButtons, button)
