@@ -16,9 +16,9 @@ If you have any problems, please contact me on discord - johngetman#5518
 Open lua/menu/gmenu/gmenu.lua, then edit any values you need.
 
 ## Screenshots
-![First](https://github.com/johngetman/gmenu/blob/main/screenshots/01.png?raw=true)
-![Second](https://github.com/johngetman/gmenu/blob/main/screenshots/02.png?raw=true)
-![Tritary](https://github.com/johngetman/gmenu/blob/main/screenshots/03.png?raw=true)
+![First](https://github.com/johngetman/gmenu/blob/main/screens/01.png?raw=true)
+![Second](https://github.com/johngetman/gmenu/blob/main/screens/02.png?raw=true)
+![Tritary](https://github.com/johngetman/gmenu/blob/main/screens/03.png?raw=true)
 
 ## Special thanks
 robotboy655 - for noicon.png
