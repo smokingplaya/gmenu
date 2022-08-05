@@ -5,7 +5,8 @@ function gmenu:GetMultiplayer()
     columnsheet:Dock(FILL)
 
     local registerGamemode = function(gm)
-        local panel = vgui.Create("DListView")
+        local panel = gmenu.gui:DListView() --vgui.Create("DListView")
+        panel.VBar.btnGrip:SetColor(gmenu_trit)
         panel.DoDoubleClick = function(self, _, panel)
             JoinServer(panel.ip) -- Connect to the server
         end
@@ -38,7 +39,7 @@ function gmenu:GetMultiplayer()
         end
 
         local c_plys = panel:AddColumn(language.GetPhrase("server_players"))
-        c_plys:SetWide(panel:GetParent():GetWide()*0.20)
+        c_plys:SetWide(40)
         c_plys:SetTall(30)
         c_plys.Header:SetFont("gmenu.14")
         c_plys.Header:SetTextColor(gmenu_text)
@@ -47,7 +48,7 @@ function gmenu:GetMultiplayer()
         end
 
         local c_ping = panel:AddColumn(language.GetPhrase("server_ping"))
-        c_ping:SetWide(panel:GetParent():GetWide()*0.20)
+        c_ping:SetWide(40)
         c_ping:SetTall(30)
         c_ping.Header:SetFont("gmenu.14")
         c_ping.Header:SetTextColor(gmenu_text)
