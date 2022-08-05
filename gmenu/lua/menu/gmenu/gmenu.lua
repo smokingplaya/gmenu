@@ -11,7 +11,7 @@ gmenu.MenuTabs = {}
 
 gmenu.Config.Font = "Montserrat Regular"
 gmenu.Config.FontBold = "Montserrat SemiBold"
-gmenu.Config.Rounding = 8 -- Rounding of all blocks (number)
+gmenu.Config.Rounding = 4 -- Rounding of all blocks (number)
 gmenu.Config.HasOffset = true -- Is Offsets enabled? (true/false)
 gmenu.Config.ClockEnabled = true -- Is clock enabled? (true/false)
 
@@ -30,8 +30,7 @@ gmenu_round, gmenu_prim, gmenu_sec, gmenu_trit, gmenu_text, gmenu_stext = gmenu.
 --[[ Functions ]]--
 
 function gmenu:AddToMenu(icon, panel)
-    local icon = Material(icon)
-    table.insert(self.MenuTabs, {icon = icon, panel = panel})
+    table.insert(self.MenuTabs, {icon = Material(icon), panel = panel})
 end
 
 function gmenu:GetBasePanel()
