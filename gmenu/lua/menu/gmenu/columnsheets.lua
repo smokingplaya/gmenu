@@ -45,11 +45,11 @@ function panel:Init()
 		end
 	end
 
-	self.Menu.Gamemode = self.Menu:Add("DButton")
+	self.Menu.Gamemode = gmenu.gui:Button(self.Menu)
 	self.Menu.Gamemode:Dock(RIGHT)
 	self.Menu.Gamemode:SetWide(40)
-	self.Menu.Gamemode:SetText("")
-	--self.Menu.Gamemode:SetTooltip(engine.GetNiceGamemode(engine.ActiveGamemode())) -- TODO: Fix it
+	self.Menu.Gamemode:SetColorStyle(gmenu_sec, gmenu_trit)
+	self.Menu.Gamemode:SetIcon(Material("gmenu/gamemodes.png"), 16, 16)
 	self.Menu.Gamemode.DoClick = function(self)
 		local dmenu = gmenu.gui:DMenu()
 		dmenu:SetMaxHeight(ScrW()*0.8)
@@ -65,23 +65,14 @@ function panel:Init()
 
 		dmenu:Open()
 	end
-	
-	local mat = Material("gmenu/gamemodes.png")
-	
-	self.Menu.Gamemode.Paint = function(panel, w, h)
-		draw.RoundedBox(self.HasOffset and gmenu_round or 0, 0, 0, w, h, panel:IsHovered() and gmenu_trit or gmenu_sec)
-
-		surface.SetDrawColor(gmenu_text)
-		surface.SetMaterial(mat)
-		surface.DrawTexturedRect(w/2-8, h/2-8, 16, 16)
-	end
 
 	--
-	
-	self.Menu.Language = self.Menu:Add("DButton")
+
+	self.Menu.Language = gmenu.gui:Button(self.Menu)
 	self.Menu.Language:Dock(RIGHT)
 	self.Menu.Language:SetWide(40)
-	self.Menu.Language:SetText("")
+	self.Menu.Language:SetColorStyle(gmenu_sec, gmenu_trit)
+	self.Menu.Language:SetIcon(Material(GetLanguageIcon(engine.GetLanguages()[GetConVarString( "gmod_language" )])) or Material("gmenu/language.png"), 16, 11)
 	self.Menu.Language.DoClick = function(self)
 		local dmenu = gmenu.gui:DMenu() --DermaMenu()
 		dmenu:SetMaxHeight(ScrW()*0.8)
@@ -94,16 +85,6 @@ function panel:Init()
 		end
 
 		dmenu:Open()
-	end
-	
-	self.Menu.Language.Icon = Material(GetLanguageIcon(engine.GetLanguages()[GetConVarString( "gmod_language" )])) or Material("gmenu/language.png")
-	
-	self.Menu.Language.Paint = function(panel, w, h)
-		draw.RoundedBox(self.HasOffset and gmenu_round or 0, 0, 0, w, h, panel:IsHovered() and gmenu_trit or gmenu_sec)
-
-		surface.SetDrawColor(gmenu_text)
-		surface.SetMaterial(panel.Icon)
-		surface.DrawTexturedRect(w/2-8, h/2-8, 16, 16)
 	end
 
 	--
@@ -127,22 +108,15 @@ end
 function panel:AddTab(icon, panel)
 	local Sheet = {}
 
-	Sheet.Button = self.Menu:Add("DButton")
-	Sheet.Button:SetText("")
+	Sheet.Button = gmenu.gui:Button(self.Menu)
+	Sheet.Button:SetColorStyle(gmenu_sec, gmenu_trit)
+	Sheet.Button:SetIcon(icon, 16, 16)
 	Sheet.Button:Dock(LEFT)
 	Sheet.Button:SetWide(40)
 
 	if self.HasOffset then
 		Sheet.Button:SetWide(30)
 		Sheet.Button:DockMargin(5, 5, 0, 5)
-	end
-
-	Sheet.Button.Paint = function(panel, w, h)
-		draw.RoundedBox(self.HasOffset and gmenu_round or 0, 0, 0, w, h, panel:IsHovered() and gmenu_trit or gmenu_sec)
-
-		surface.SetDrawColor(gmenu_text)
-		surface.SetMaterial(icon)
-		surface.DrawTexturedRect(w/2-8, h/2-8, 16, 16)
 	end
 
 	Sheet.Button.DoClick = function()
@@ -166,14 +140,12 @@ function panel:AddTab(icon, panel)
 end
 
 function panel:SetActiveButton( active )
-
-	if ( self.ActiveButton == active ) then
+	if self.ActiveButton == active then
 		self.ActiveButton.Target:SetVisible(not self.ActiveButton.Target:IsVisible())
-
 		return
 	end
 
-	if ( self.ActiveButton && self.ActiveButton.Target ) then
+	if self.ActiveButton && self.ActiveButton.Target then
 		self.ActiveButton.Target:SetVisible( false )
 		self.ActiveButton:SetSelected( false )
 		self.ActiveButton:SetToggle( false )
@@ -185,7 +157,6 @@ function panel:SetActiveButton( active )
 	active:SetToggle( true )
 
 	self.Content:InvalidateLayout()
-
 end
 
 derma.DefineControl("gmenu.ColumnSheet", "", panel, "Panel")
@@ -203,9 +174,11 @@ function panel:Init()
 	self.Menu:Dock(LEFT)
 	self.Menu:SetWide(200)
 
-	self.Menu.Search = gmenu.gui:TextEntry(self.Menu, language.GetPhrase("searchbar_placeholer"))
-    self.Menu.Search:Dock(TOP)
-	self.Menu.Search:DockMargin(0, 0, 0, 10)
+	self.Menu.SearchPan, self.Menu.Search = gmenu.gui:TextEntry(self.Menu, language.GetPhrase("searchbar_placeholer"))
+    self.Menu.SearchPan:SetColor(gmenu_trit)
+	self.Menu.SearchPan:Dock(TOP)
+	self.Menu.SearchPan:DockMargin(0, 0, 0, 10)
+	self.Menu.SearchPan:SetTall(30)
 
 	self.Menu.Search.OnEnter = function(panel, value)
 		for k, v in ipairs(self.Items) do
@@ -219,9 +192,8 @@ function panel:Init()
 		end
 	end
 
-	self.Menu.Buttons = self.Menu:Add("DScrollPanel")
+	self.Menu.Buttons = gmenu.gui:ScrollPanel(self.Menu)
 	self.Menu.Buttons:Dock(FILL)
-	self.Menu.Buttons:GetVBar():SetWide(0)
 
 	self.Content = self:Add("Panel")
 	self.Content:Dock( FILL )
@@ -239,17 +211,11 @@ function panel:AddTab(label, panel, insert)
 	local insert = insert == nil and true or insert
 	local Sheet = {}
 
-	Sheet.Button = self.Menu.Buttons:Add("DButton")
-	Sheet.Button:SetText(label)
-	Sheet.Button:SetFont("gmenu.16")
-	Sheet.Button:SetTextColor(gmenu_text)
+	Sheet.Button = gmenu.gui:Button(self.Menu.Buttons, label)
 	Sheet.Button:Dock(TOP)
 	Sheet.Button:SetTall(30)
 	Sheet.Button:DockMargin(0, 0, 0, 5)
-
-	Sheet.Button.Paint = function(panel, w, h)
-		draw.RoundedBox(self.HasOffset and gmenu_round or 0, 0, 0, w, h, panel:IsHovered() and gmenu_trit or gmenu_sec)
-	end
+	Sheet.Button:SetColorStyle(gmenu_sec, gmenu_trit)
 
 	Sheet.Button.DoClick = function()
 		if ispanel(panel) then
